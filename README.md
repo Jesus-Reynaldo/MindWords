@@ -1,73 +1,115 @@
 # React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+MindWords es una aplicación para aprender vocabulario con repaso espaciado, autenticación y verificación gramatical asistida por IA.
 
-Currently, two official plugins are available:
+## Características
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Autenticación con Supabase** usando `useAuth()` en `src/feactures/auth/hook/useAuth.ts`.
+- **Gestión de vocabulario (CRUD)** con tablas de Supabase (`Word`) vía `src/feactures/vocabulary/services/supabaseService.ts`.
+- **Revisión diaria** por `nextReviewDate` (Day.js) para saber qué palabras estudiar hoy.
+- **Validación gramatical con Gemini** en `src/feactures/vocabulary/services/api_gemini.ts`.
+- **UI React + MUI + Tailwind** sobre Vite + TypeScript.
 
-## React Compiler
+## Stack
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- React 19, TypeScript, Vite
+- MUI (@mui/material), Emotion
+- Tailwind CSS (v4 con `@tailwindcss/vite`)
+- Supabase (`@supabase/supabase-js`)
+- Google Generative AI (`@google/genai`)
+- dayjs
 
-## Expanding the ESLint configuration
+## Requisitos previos
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js 18+ recomendado
+- npm o pnpm
+- Una instancia de Supabase (URL y Anon Key)
+- Una API Key de Gemini (Google AI Studio)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Variables de entorno
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+La app lee variables desde `import.meta.env`.
+Debes crear un archivo `.env` en la raíz del proyecto con:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Supabase
+VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+
+# Gemini (Google AI)
+VITE_GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Referencias en el código:
+- `src/feactures/core/lib/supabaseClient.ts` usa `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`.
+- `src/feactures/vocabulary/services/api_gemini.ts` usa `VITE_GEMINI_API_KEY`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+> Nota: `.env` y `.env.local` están ignorados por Git (ver `.gitignore`). Si quieres, puedo generar un `.env.example` con estos nombres de variables.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Scripts
+
+Disponibles en `package.json`:
+
+```bash
+# Desarrollo con Vite
+npm run dev
+
+# Construcción de producción
+npm run build
+
+# Previsualización del build
+npm run preview
+
+# Linter
+npm run lint
 ```
+
+## Puesta en marcha
+
+1. Clona el repo e instala dependencias:
+   ```bash
+   npm install
+   ```
+2. Crea `.env` con tus claves (ver sección Variables de entorno).
+3. Arranca en desarrollo:
+   ```bash
+   npm run dev
+   ```
+4. Abre el navegador en la URL que muestre Vite (por defecto, `http://localhost:5173`).
+
+## Estructura relevante
+
+```
+src/
+  feactures/
+    auth/
+      hook/
+        useAuth.ts                # Gestión de sesión Supabase
+    core/
+      lib/
+        supabaseClient.ts         # Cliente Supabase (env)
+    vocabulary/
+      services/
+        supabaseService.ts        # CRUD de palabras + filtros por usuario
+        api_gemini.ts             # Validación gramatical con Gemini (env)
+```
+
+## Configuración de Supabase
+
+- Crea tabla `Word` con al menos:
+  - `id` (uuid, pk)
+  - `user_id` (uuid)
+  - `text` (text)
+  - `nextReviewDate` (date)
+- Añade RLS adecuada para que cada usuario solo acceda a sus filas (`user_id = auth.uid()`).
+
+## Seguridad
+- La clave anónima de Supabase es pública en front-end, pero usa RLS.
+- No subas `.env` al repositorio.
+
+## Problemas comunes
+  113→- 403 al hacer `git push`: suele ser por credenciales cacheadas de otra cuenta GitHub. Elimina la credencial `git:https://github.com` en el Administrador de Credenciales de Windows o ejecuta `git credential-manager git logout https://github.com` y vuelve a iniciar sesión.
+
+## Licencia
+
+MIT
