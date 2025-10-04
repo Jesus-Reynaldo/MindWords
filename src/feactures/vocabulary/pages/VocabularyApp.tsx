@@ -60,7 +60,7 @@ const VocabularyApp: React.FC = () => {
         dias: [intervals[0]]
       }     
       const words : Word[] = await insertWord(word);
-      setWords(words);
+      setWords(prevWords => [...prevWords, word]);
       
       console.log(words);
       localStorage.setItem('words', JSON.stringify([...words, word]));

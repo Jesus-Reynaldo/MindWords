@@ -62,21 +62,27 @@ export const updateWordSupabase = async (word: Word): Promise<Word[]> => {
   return data as Word[];
 };
 
-export const getWordByReviewDate = async (): Promise<Word[]> => {
+export const getWordByReviewDate = async (limit: number = 20): Promise<Word[]> => {
   const {data: { user }, error: userError} = await supabase.auth.getUser();
-    if (userError || !user) {
-      console.error("User not authenticated:", userError?.message);
-      return [];
-    }
+  if (userError || !user) {
+    console.error("User not authenticated:", userError?.message);
+    return [];
+  }
+  
   const today = dayjs().format("YYYY-MM-DD");
-  console.log(today);
-  const { data, error } = await supabase.from("Word").select().eq("nextReviewDate", today).eq("user_id", user.id);
-  console.log("data", data);
-
+  
+  const { data, error } = await supabase
+    .from("Word")
+    .select()
+    .lte("nextReviewDate", today)
+    .eq("user_id", user.id)
+    .order("nextReviewDate", { ascending: true })
+    .limit(limit);
+  
   if (error) {
     console.error("Error fetching words:", error.message);
     return [];
   }
-
+  
   return data as Word[];
 };
