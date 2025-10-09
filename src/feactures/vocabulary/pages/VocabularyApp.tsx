@@ -1,70 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import { BookOpen, Plus, XCircle } from 'lucide-react';
-import type { Word, GrammarFeedback } from '../interfaces/vocabulary.interface';
-import { validateGrammarWithGemini } from '../services/api_gemini';
+import React, { useState, useEffect } from "react";
+import { BookOpen, Plus, SearchIcon, XCircle } from "lucide-react";
+import type {
+  Word,
+  GrammarFeedback,
+  DefineWord,
+} from "../interfaces/vocabulary.interface";
+import {
+  defineWordWithGemini,
+  validateGrammarWithGemini,
+} from "../services/api_gemini";
 
-import { useForm, type SubmitHandler } from "react-hook-form"
-import { TableListVocabulary } from '../components/TableListVocabulary';
-import { getWords, insertWord } from '../services/supabaseService';
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { TableListVocabulary } from "../components/TableListVocabulary";
+import { getWords, insertWord } from "../services/supabaseService";
+import { IconButton, InputBase, Paper } from "@mui/material";
 
 type Inputs = {
   word: string;
   definition: string;
   sentence: string;
-}
+};
 const intervals: number[] = [1, 2, 4, 7, 14, 30];
 
 const VocabularyApp: React.FC = () => {
-  
   const [words, setWords] = useState<Word[]>([]);
   const [grammarFeedback, setGrammarFeedback] = useState<GrammarFeedback>({
     isCorrect: false,
-    explanation: '',
-    suggestion: ''
+    explanation: "",
+    suggestion: "",
   });
 
-  const { register, handleSubmit, reset } = useForm<Inputs>();
+  const { register, handleSubmit, reset, watch, setValue } = useForm<Inputs>();
 
   useEffect(() => {
     const fetchWords = async () => {
-      const words : Word[] = await getWords();
+      const words: Word[] = await getWords();
       setWords(words);
     };
     fetchWords();
   }, []);
 
-  console.log("words", words);
-
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const response: GrammarFeedback = await validateGrammarWithGemini(data.sentence, data.word);
+      const response: GrammarFeedback = await validateGrammarWithGemini(
+        data.sentence,
+        data.word
+      );
       console.log(response);
       setGrammarFeedback(response);
-      if(response.isCorrect){
+      if (response.isCorrect) {
         addNewWord(data);
         reset();
       }
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const addNewWord = async (data: Inputs) => {
     const word: Word = {
-        word: data.word,
-        definition: data.definition,
-        sentence: [data.sentence],
-        level: 0,
-        nextReviewDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toDateString(),
-        dateAdded: new Date().toDateString(),
-        dias: [intervals[0]]
-      }     
-      const words : Word[] = await insertWord(word);
-      setWords(prevWords => [...prevWords, word]);
-      
-      console.log(words);
-      localStorage.setItem('words', JSON.stringify([...words, word]));
+      word: data.word,
+      definition: data.definition,
+      sentence: [data.sentence],
+      level: 0,
+      nextReviewDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toDateString(),
+      dateAdded: new Date().toDateString(),
+      dias: [intervals[0]],
+    };
+    const words: Word[] = await insertWord(word);
+    setWords((prevWords) => [...prevWords, word]);
 
+    console.log(words);
+    localStorage.setItem("words", JSON.stringify([...words, word]));
+  };
+  const searchDefinitionWord = async (word: string) => {
+    try {
+      const response: DefineWord = await defineWordWithGemini(word);
+      setValue("definition", response.definition || "");
+      console.log(watch("definition"));
+    } catch (error) {
+      console.error(error);
+    }
+    console.log(word);
   };
 
   return (
@@ -88,23 +105,55 @@ const VocabularyApp: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Palabra/Expresión
+                  Word/Expression
                 </label>
-                <input 
-                  type="text"
-                  {...register("word", { required: true })} 
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="Example: serendipity"
-                />
+                <Paper
+                  component="form"
+                  sx={{
+                    p: "2px 4px",
+                    display: "flex",
+                    alignItems: "center",
+                    width: "100%",
+                    borderRadius: "0.5rem",
+                  }}
+                >
+                  <InputBase
+                    sx={{
+                      width: "100%",
+                      p: "2px 4px",
+                      border: "1px solid #e5e7ef",
+                      borderRadius: "0.25rem",
+                      focus: {
+                        ring: "2px",
+                        ringColor: "#7a00e9a",
+                        borderColor: "transparent",
+                      },
+                    }}
+                    type="text"
+                    {...register("word", { required: true })}
+                    placeholder="Example: serendipity"
+                    inputProps={{ "aria-label": "search" }}
+                  />
+                  <IconButton
+                    type="button"
+                    sx={{ p: "10px" }}
+                    aria-label="search"
+                    onClick={() =>
+                      searchDefinitionWord(watch("word")?.trim() || "")
+                    }
+                  >
+                    <SearchIcon />
+                  </IconButton>
+                </Paper>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Definition
                 </label>
-                <input 
+                <input
                   type="text"
-                  {...register("definition", { required: false })} 
+                  {...register("definition", { required: false })}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Definition in English"
                 />
@@ -113,13 +162,13 @@ const VocabularyApp: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Example sentence / Mental association 
+                Example sentence / Mental association
               </label>
               <textarea
-              {...register("sentence", { required: true })} 
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              rows={3}
-              placeholder="Write a example sentence or mental association that helps you remember the word"
+                {...register("sentence", { required: true })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                rows={3}
+                placeholder="Write a example sentence or mental association that helps you remember the word"
               />
             </div>
 
@@ -133,23 +182,27 @@ const VocabularyApp: React.FC = () => {
           </form>
         </div>
       </div>
-      {grammarFeedback.isCorrect == false && grammarFeedback.explanation != "" && grammarFeedback.suggestion != "" && (
-        <div className="mt-8 bg-yellow-200 p-4 rounded-lg">
-          <div className="flex items-center">
-            <XCircle className="mr-2 text-yellow-600" size={24} />
-            <p className="text-yellow-700 font-bold">La oración no es correcta.</p>
+      {grammarFeedback.isCorrect == false &&
+        grammarFeedback.explanation != "" &&
+        grammarFeedback.suggestion != "" && (
+          <div className="mt-8 bg-yellow-200 p-4 rounded-lg">
+            <div className="flex items-center">
+              <XCircle className="mr-2 text-yellow-600" size={24} />
+              <p className="text-yellow-700 font-bold">
+                La oración no es correcta.
+              </p>
+            </div>
+            <p className="text-yellow-700">{grammarFeedback.explanation}</p>
+            <p className="text-yellow-700 font-bold">
+              Sugerencia: {grammarFeedback.suggestion}
+            </p>
           </div>
-          <p className="text-yellow-700">{grammarFeedback.explanation}</p>
-          <p className="text-yellow-700 font-bold">Sugerencia: {grammarFeedback.suggestion}</p>
-        </div>
-      )}
+        )}
       <div className="mt-8">
         <TableListVocabulary words={words} />
       </div>
     </div>
-    );
-  }
-
-
+  );
+};
 
 export default VocabularyApp;
