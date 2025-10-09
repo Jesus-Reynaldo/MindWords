@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import type { GrammarFeedback } from "../interfaces/vocabulary.interface";
+import type { DefineWord, GrammarFeedback } from "../interfaces/vocabulary.interface";
 
 const ai = new GoogleGenAI({apiKey: import.meta.env.VITE_GEMINI_API_KEY});
 
@@ -26,6 +26,27 @@ Oración: "${sentence}"`,
       },
     }
 
+  });
+  return JSON.parse(response.text || '{}');
+}
+
+export async function defineWordWithGemini(word: string): Promise<DefineWord> {
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash-lite",
+    contents: `Define la palabra "${word}" en inglés. La respuesta debe ser corta y precisa maximo 6 palabras. Al final debe decir entre parentesis que tipo de palabra es por ejemplo (n, v, adj, adv, prep, phv, ind)`,
+    config: {
+      thinkingConfig: {
+        thinkingBudget: 0, // Disables thinking
+      },
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: "object",
+        properties: {
+          definition: { type: "string" },
+        },
+        required: ["definition"],
+      },
+    }
   });
   return JSON.parse(response.text || '{}');
 }

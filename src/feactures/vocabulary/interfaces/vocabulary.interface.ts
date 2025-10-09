@@ -37,4 +37,8 @@ export interface ApiResponse {
   }>;
 }
 
+export interface DefineWord {
+  definition: string;
+}
+
 export type Mode = 'review' | 'add';
