@@ -67,27 +67,21 @@ const VocabularyApp: React.FC = () => {
 
   };
 
-
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-purple-50 to-pink-100 min-h-screen">
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 flex items-center">
             <BookOpen className="mr-3 text-purple-600" />
-            Vocabulario en Inglés
+            Vocabulary in English
           </h1>
         </div>
-
-        {/* Agregar nueva palabra */}
         <div className="space-y-6">
           <h2 className="text-xl font-semibold text-gray-700 flex items-center">
             <Plus className="mr-2 text-green-600" />
-            Agregar Nueva Palabra
+            Add New Word
           </h2>
-
-
           <form onSubmit={handleSubmit(onSubmit)}>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -97,32 +91,32 @@ const VocabularyApp: React.FC = () => {
                   type="text"
                   {...register("word", { required: true })} 
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="Ejemplo: serendipity"
+                  placeholder="Example: serendipity"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Definición
+                  Definition
                 </label>
                 <input 
                   type="text"
                   {...register("definition", { required: false })} 
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="Definición en español"
+                  placeholder="Definition in English"
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Oración de ejemplo / Asociación mental (opcional)
+                Example sentence / Mental association 
               </label>
               <textarea
               {...register("sentence", { required: true })} 
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               rows={3}
-              placeholder="Escribe una oración de ejemplo o una asociación mental que te ayude a recordar la palabra"
+              placeholder="Write a example sentence or mental association that helps you remember the word"
               />
             </div>
 
@@ -131,7 +125,7 @@ const VocabularyApp: React.FC = () => {
               className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
               <Plus className="mr-2" size={16} />
-              Agregar Palabra
+              Add Word
             </button>
           </form>
         </div>
