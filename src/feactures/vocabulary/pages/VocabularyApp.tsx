@@ -75,6 +75,9 @@ const VocabularyApp: React.FC = () => {
             <BookOpen className="mr-3 text-purple-600" />
             Vocabulary in English
           </h1>
+          <h2 className="text-xl font-semibold text-gray-700 flex items-center md:flex-wrap">
+            Words:<span className="text-purple-600 ml-2">{words.length}</span>
+          </h2>
         </div>
         <div className="space-y-6">
           <h2 className="text-xl font-semibold text-gray-700 flex items-center">

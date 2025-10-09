@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export const TableListVocabulary = ({words}: {words: Word[]}) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const handleChangePage = ( newPage: number) => {
     setPage(newPage);
   };
@@ -83,7 +83,7 @@ export const TableListVocabulary = ({words}: {words: Word[]}) => {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
         component="div"
         count={words.length}
         rowsPerPage={rowsPerPage}
