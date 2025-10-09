@@ -20,7 +20,7 @@ type Inputs = {
   definition: string;
   sentence: string;
 };
-const intervals: number[] = [1, 2, 4, 7, 14, 30];
+const intervals: number[] = [1, 2, 4, 7, 14, 30, 45, 60, 90, 120];
 
 const VocabularyApp: React.FC = () => {
   const [words, setWords] = useState<Word[]>([]);
@@ -51,6 +51,9 @@ const VocabularyApp: React.FC = () => {
       if (response.isCorrect) {
         addNewWord(data);
         reset();
+        setValue("word", "");
+        setValue("definition", "");
+        setValue("sentence", "");
       }
     } catch (error) {
       console.error(error);
