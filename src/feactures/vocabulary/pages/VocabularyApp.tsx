@@ -13,7 +13,7 @@ import {
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { TableListVocabulary } from "../components/TableListVocabulary";
 import { getWords, insertWord } from "../services/supabaseService";
-import { IconButton, InputBase, Paper } from "@mui/material";
+import { Chip, IconButton, InputBase, Paper, Stack } from "@mui/material";
 
 type Inputs = {
   word: string;
@@ -24,6 +24,10 @@ const intervals: number[] = [1, 2, 4, 7, 14, 30, 45, 60, 90, 120];
 
 const VocabularyApp: React.FC = () => {
   const [words, setWords] = useState<Word[]>([]);
+  const [type, setType] = useState<string>("");
+  const [synonyms, setSynonyms] = useState<string[]>([]);
+  const [antonyms, setAntonyms] = useState<string[]>([]);
+  
   const [grammarFeedback, setGrammarFeedback] = useState<GrammarFeedback>({
     isCorrect: false,
     explanation: "",
@@ -54,6 +58,9 @@ const VocabularyApp: React.FC = () => {
         setValue("word", "");
         setValue("definition", "");
         setValue("sentence", "");
+        setType("");
+        setSynonyms([]);
+        setAntonyms([]);
       }
     } catch (error) {
       console.error(error);
@@ -69,6 +76,9 @@ const VocabularyApp: React.FC = () => {
       nextReviewDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toDateString(),
       dateAdded: new Date().toDateString(),
       dias: [intervals[0]],
+      type: type,
+      synonyms: synonyms,
+      antonyms: antonyms,
     };
     const words: Word[] = await insertWord(word);
     setWords((prevWords) => [...prevWords, word]);
@@ -80,6 +90,9 @@ const VocabularyApp: React.FC = () => {
     try {
       const response: DefineWord = await defineWordWithGemini(word);
       setValue("definition", response.definition || "");
+      setSynonyms(response.synonyms || []);
+      setAntonyms(response.antonyms || []);
+      setType(response.type || "");
       console.log(watch("definition"));
     } catch (error) {
       console.error(error);
@@ -160,6 +173,36 @@ const VocabularyApp: React.FC = () => {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Definition in English"
                 />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center justify-center m-2">
+              <div className="col-span-2">
+              <Stack direction="row" spacing={1} alignItems="center">
+                <p className="block text-sm font-medium text-gray-700 mb-2">
+                  Type: 
+                </p>
+                {
+                  type !== "" ?  (
+                    <Chip label={type} color="primary" size="small" />
+                  ) : null
+                }
+              </Stack>
+              </div>
+              <div className="col-span-5">
+              <Stack direction="row" spacing={1} alignItems="center">
+                <p className="block text-sm font-medium text-gray-700 mb-2">
+                  Synonyms: 
+                </p>
+                {synonyms.map((synonym) => <Chip key={synonym} label={synonym} color="success" size="small" />)}
+              </Stack>
+              </div>
+              <div className="col-span-5">
+              <Stack direction="row" spacing={1} alignItems="center">
+                <p className="block text-sm font-medium text-gray-700 mb-2">
+                  Antonyms: 
+                </p>
+                {antonyms.map((antonym) => <Chip key={antonym} label={antonym} color="error" size="small" />)}
+              </Stack>
               </div>
             </div>
 
