@@ -12,7 +12,7 @@ export async function validateGrammarWithGemini(sentence: string, word: string):
 Oración: "${sentence}"`,
     config: {
       thinkingConfig: {
-        thinkingBudget: 0, // Disables thinking
+        thinkingBudget: 0, 
       },
       responseMimeType: "application/json",
       responseSchema: {
@@ -36,15 +36,19 @@ export async function defineWordWithGemini(word: string): Promise<DefineWord> {
     contents: `Define la palabra "${word}" en inglés. La respuesta debe ser corta y precisa maximo 6 palabras. Al final debe decir entre parentesis que tipo de palabra es por ejemplo (n, v, adj, adv, prep, phv, ind)`,
     config: {
       thinkingConfig: {
-        thinkingBudget: 0, // Disables thinking
+        thinkingBudget: 0, 
       },
       responseMimeType: "application/json",
       responseSchema: {
         type: "object",
         properties: {
           definition: { type: "string" },
+          type: { type: "string" },
+          synonyms: { type: "array", items: { type: "string" } },
+          antonyms: { type: "array", items: { type: "string" } },
+          examples: { type: "array", items: { type: "string" } },
         },
-        required: ["definition"],
+        required: ["definition", "type", "synonyms", "antonyms", "examples"],
       },
     }
   });

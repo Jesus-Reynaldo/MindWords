@@ -10,6 +10,9 @@ export interface Word {
   lastReviewed?: string;
   dias: number[];
   user_id?: string;
+  type?: string;
+  synonyms?: string[];
+  antonyms?: string[];
 }
 
 export interface NewWord {
@@ -39,6 +42,10 @@ export interface ApiResponse {
 
 export interface DefineWord {
   definition: string;
+  type: string;
+  synonyms: string[];
+  antonyms: string[];
+  examples: string[];
 }
 
 export type Mode = 'review' | 'add';
