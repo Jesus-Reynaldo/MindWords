@@ -5,16 +5,23 @@ import { ReviewPage } from "./feactures/vocabulary/pages/ReviewPage";
 import Login from "./feactures/auth/Login";
 import Signup from "./feactures/auth/Signup";
 import ProtectedRoute from "./feactures/auth/components/ProtectedRoute";
+import Layout from "./feactures/layout/Layout";
+import { GrammarPage } from "./feactures/grammar/pages/GrammarPage";
+import { GrammarTopicsPage } from "./feactures/grammar/pages/GrammarTopicsPage";
 
 function App() {
   return (
-    //<Review words={words} />
-    //<VocabularyApp />
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/vocabulary" element={<ProtectedRoute><VocabularyApp /></ProtectedRoute>} />
-      <Route path="/" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
+
+      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        <Route path="/review" element={<ReviewPage />}  />
+        <Route path="/vocabulary" element={<VocabularyApp />} />
+        <Route path="/" element={<ReviewPage />} />
+        <Route path="/grammar/:grammarId" element={<GrammarPage />} />
+        <Route path="/grammar" element={<GrammarTopicsPage />} />
+      </Route>
     </Routes>
   );
 }
