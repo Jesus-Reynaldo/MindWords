@@ -31,6 +31,13 @@ export const styles = {
       fontFamily: "Poppins",
       padding: "0.8rem",
     },
+    cardTitle: {
+      color: "#ffffff",
+      fontSize: "0.8rem",
+      fontWeight: "700",
+      fontFamily: "Poppins",
+      padding: "0.2rem",
+    },
   },
   paper: {
     mainContent: {
@@ -45,13 +52,14 @@ export const styles = {
     mainContent: {
       p: 2,
       width: "100%",
-      height: "100vh",
+      height: "100%",
       backgroundColor: "#e9e7ff",
     },
     card: {
       width: "100%",
+      height: {xs: "auto", md: "800px"},
       display: "grid",  
-      gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px, 100%), 2fr))',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px, 100%), 1fr))',
       gap: 2,
     },
   },
@@ -102,5 +110,41 @@ export const styles = {
       transform: "translateY(-2px)",
       boxShadow: "0 4px 12px rgba(124, 92, 244, 0.4)",
     },
+    card: {
+      backgroundColor: "#4650ba",
+      borderRadius: "0.875rem",
+      boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.03)",
+      padding: "2.5rem",
+      marginBlock: "1.6rem",
+    },  
   },
+  level: {
+    container: {
+      backgroundColor: "#ffffff",
+      borderRadius: "0.875rem",
+      boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.03)",
+      padding: "0.5rem",
+    },
+  },
+  mainTitle: {
+    color: "#2e0f56",
+    fontSize: "2rem",
+    fontWeight: "700",
+    fontFamily: "Poppins",
+    padding: "0.8rem",
+    margin: "0 auto",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addGrammarButton: {
+    textTransform: 'capitalize', 
+    fontWeight: 'bold', 
+    mb: 4, 
+    bgcolor: '#2e0f56', 
+    color: '#fff',
+    margin: "0 auto",
+    display: "flex",
+  }
 };

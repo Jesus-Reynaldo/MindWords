@@ -5,9 +5,9 @@ import type { GrammarTopic } from "../interfaces/grammar.interface";
 import { getGrammarTopics } from "../services/supabaseGrammar";
 import { Loading } from "../../../shares/components/Loading";
 import { useNavigate } from "react-router";
-import { Plus } from 'lucide-react';
+import { BookOpen, Plus } from 'lucide-react';
 import { generateGrammarTopicWithGemini } from "../services/api_grammar_gemini";
-import { AddGrammarModal } from "../components/addGrammarModal";
+import { AddGrammarModal } from "../components/AddGrammarModal";
 
 export const GrammarTopicsPage = () => {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ export const GrammarTopicsPage = () => {
   }*/
 
   useEffect(() => {
-    if (grammarTopics.length > 0) {
+    if (grammarTopics) {
       setLoading(false);
     }
   }, [grammarTopics]);
@@ -53,6 +53,12 @@ export const GrammarTopicsPage = () => {
 
   return (
     <Box sx={styles.box.mainContent}>
+      <Typography variant="h2" sx={styles.mainTitle}>
+        Grammar Topics
+      </Typography>
+      <Button variant="contained"  size="large" sx={styles.addGrammarButton} onClick={handleOpenModal} startIcon={<Plus />}>
+        Add a new topic
+      </Button>
       <Box sx={styles.box.card}>
         {grammarTopics.map((grammarTopic, index) => (
           <Card sx={styles.paper.mainContent} key={index}>
@@ -68,10 +74,12 @@ export const GrammarTopicsPage = () => {
               }}
             >
               <CardContent sx={{ height: "100%" }}>
-                <Typography variant="h1" sx={styles.typography.titleGrammar}>
-                  {grammarTopic?.title}
-                </Typography>
-                <Box sx={styles.explainingBox.container}>
+                <Box sx={{minHeight: "100px" , display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+                  <Typography variant="subtitle1" sx={styles.typography.cardTitle}>
+                    {grammarTopic?.title}
+                  </Typography>
+                </Box>
+                <Box sx={styles.level.container}>
                   <Typography variant="h6" sx={styles.explainingBox.title}>
                     Level
                   </Typography>
@@ -82,12 +90,12 @@ export const GrammarTopicsPage = () => {
               </CardContent>
             </CardActionArea>
             <CardActions>
-              <Button size="small" sx={styles.typography.grammarTopic } onClick={handleOpenModal}><Plus /> Add</Button>
+              <Button size="small" sx={styles.typography.grammarTopic } onClick={() => navigate(`/grammar/${grammarTopic?.id}`)}><BookOpen /> See </Button>
             </CardActions>
           </Card>
         ))}
       </Box>
-      <AddGrammarModal open={openModal} onClose={handleCloseModal} topic={""} levelEnglish={""} />
+      <AddGrammarModal open={openModal} onClose={handleCloseModal} />
     </Box>
   );
 };

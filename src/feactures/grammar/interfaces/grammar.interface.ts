@@ -1,6 +1,6 @@
 export interface GrammarTopic {
-    id: string;
-    createdAt: string;
+    id?: string;
+    createdAt?: string;
     levelEnglish: string;
     title: string;
     explanation: string;
@@ -8,10 +8,10 @@ export interface GrammarTopic {
     examples: string[];
 }
 export interface ReviewTopic {
-    id: string;
-    topicId: string;
-    createdAt: string;
-    nextReviewDate: string;
-    dias: number[];
+    id?: string;
+    topicId?: string;
+    createdAt?: string;
+    nextReviewDate?: string;
+    dias?: number[];
 }
 

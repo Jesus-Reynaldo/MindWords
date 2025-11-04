@@ -11,7 +11,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { Link, Outlet, useLocation } from 'react-router';
 import { menuItems } from './utils/menuItems';
-import { Menu } from 'lucide-react';
+import { LogOut, Menu } from 'lucide-react';
 import { supabase } from "../core/lib/supabaseClient";
 
 export default function Layout() {
@@ -42,16 +42,16 @@ export default function Layout() {
             </ListItemButton>
           </ListItem>
         ))}
+        <ListItem key="logout" disablePadding>
+          <ListItemButton onClick={async () => {
+            await supabase.auth.signOut();
+            window.location.href = '/';
+          }}>
+            <ListItemIcon style={{color: '#c8a8f0'}}><LogOut size={20} /></ListItemIcon>
+            <ListItemText primary="Salir" />
+          </ListItemButton>
+        </ListItem>
       </List>
-      <Box sx={{ mt: 2 }}>
-        <Button variant="contained" onClick={async () => {
-          await supabase.auth.signOut();
-          window.location.href = '/';
-        }}>
-          Salir
-        </Button>
-      </Box>
-
     </Box>
   );
 

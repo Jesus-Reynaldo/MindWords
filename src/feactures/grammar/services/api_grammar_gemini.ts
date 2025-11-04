@@ -1,11 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
+import type { GrammarTopic } from "../interfaces/grammar.interface";
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 export async function generateGrammarTopicWithGemini(
   topic: string,
   levelEnglish: string
-): Promise<string> {
+): Promise<GrammarTopic> {
   const system = `
 You are an expert grammar tutor based on the book "Understanding and Using English Grammar".
 You create spaced-repetition study cards. Always answer ONLY in English.
@@ -48,5 +49,6 @@ Constraints:
       },
     },
   });
+  console.log("response", response.text);
   return JSON.parse(response.text || "{}");
 }
