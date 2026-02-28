@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, Plus, SearchIcon, XCircle } from "lucide-react";
+import { Plus, SearchIcon, AlertTriangle } from "lucide-react";
 import type {
   Word,
   GrammarFeedback,
@@ -13,7 +13,17 @@ import {
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { TableListVocabulary } from "../components/TableListVocabulary";
 import { getWords, insertWord } from "../services/supabaseService";
-import { Chip, IconButton, InputBase, Paper, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { vocabStyles } from "../styles/style";
 
 type Inputs = {
   word: string;
@@ -27,7 +37,8 @@ const VocabularyApp: React.FC = () => {
   const [type, setType] = useState<string>("");
   const [synonyms, setSynonyms] = useState<string[]>([]);
   const [antonyms, setAntonyms] = useState<string[]>([]);
-  
+  const [showForm, setShowForm] = useState(false);
+
   const [grammarFeedback, setGrammarFeedback] = useState<GrammarFeedback>({
     isCorrect: false,
     explanation: "",
@@ -50,7 +61,6 @@ const VocabularyApp: React.FC = () => {
         data.sentence,
         data.word
       );
-      console.log(response);
       setGrammarFeedback(response);
       if (response.isCorrect) {
         addNewWord(data);
@@ -61,6 +71,7 @@ const VocabularyApp: React.FC = () => {
         setType("");
         setSynonyms([]);
         setAntonyms([]);
+        setGrammarFeedback({ isCorrect: false, explanation: "", suggestion: "" });
       }
     } catch (error) {
       console.error(error);
@@ -73,7 +84,9 @@ const VocabularyApp: React.FC = () => {
       definition: data.definition,
       sentence: [data.sentence],
       level: 0,
-      nextReviewDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toDateString(),
+      nextReviewDate: new Date(
+        Date.now() + 24 * 60 * 60 * 1000
+      ).toDateString(),
       dateAdded: new Date().toDateString(),
       dias: [intervals[0]],
       type: type,
@@ -86,6 +99,7 @@ const VocabularyApp: React.FC = () => {
     console.log(words);
     localStorage.setItem("words", JSON.stringify([...words, word]));
   };
+
   const searchDefinitionWord = async (word: string) => {
     try {
       const response: DefineWord = await defineWordWithGemini(word);
@@ -93,161 +107,199 @@ const VocabularyApp: React.FC = () => {
       setSynonyms(response.synonyms || []);
       setAntonyms(response.antonyms || []);
       setType(response.type || "");
-      console.log(watch("definition"));
     } catch (error) {
       console.error(error);
     }
-    console.log(word);
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-purple-50 to-pink-100 min-h-screen">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 flex items-center">
-            <BookOpen className="mr-3 text-purple-600" />
-            Vocabulary in English
-          </h1>
-          <h2 className="text-xl font-semibold text-gray-700 flex items-center md:flex-wrap">
-            Words:<span className="text-purple-600 ml-2">{words.length}</span>
-          </h2>
-        </div>
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-gray-700 flex items-center">
-            <Plus className="mr-2 text-green-600" />
-            Add New Word
-          </h2>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Word/Expression
-                </label>
-                <Paper
-                  component="form"
-                  sx={{
-                    p: "2px 4px",
-                    display: "flex",
-                    alignItems: "center",
-                    width: "100%",
-                    borderRadius: "0.5rem",
-                  }}
+    <Box sx={vocabStyles.pageBackground}>
+      <Box sx={vocabStyles.contentWrapper}>
+        {/* Hero header */}
+        <Box sx={{ textAlign: "center", mb: 4, pt: { xs: 2, md: 3 } }}>
+          <Typography sx={vocabStyles.heroTitle}>Vocabulary</Typography>
+          <Typography sx={vocabStyles.heroSubtitle}>
+            Build your English vocabulary with spaced repetition
+          </Typography>
+          <Stack
+            direction="row"
+            spacing={2}
+            justifyContent="center"
+            alignItems="center"
+            sx={{ mt: 2.5 }}
+          >
+            <Box sx={vocabStyles.wordCountPill}>
+              {words.length} {words.length === 1 ? "word" : "words"}
+            </Box>
+            <Button
+              startIcon={<Plus size={18} />}
+              sx={vocabStyles.heroButton}
+              onClick={() => setShowForm(!showForm)}
+            >
+              {showForm ? "Hide Form" : "Add Word"}
+            </Button>
+          </Stack>
+        </Box>
+
+        {/* Add word form */}
+        {showForm && (
+          <Box sx={vocabStyles.formCard}>
+            <Typography sx={vocabStyles.sectionTitle}>
+              Add New Word
+            </Typography>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Stack spacing={2.5}>
+                {/* Word + Definition row */}
+                <Stack
+                  direction={{ xs: "column", md: "row" }}
+                  spacing={2}
                 >
-                  <InputBase
-                    sx={{
-                      width: "100%",
-                      p: "2px 4px",
-                      border: "1px solid #e5e7ef",
-                      borderRadius: "0.25rem",
-                      focus: {
-                        ring: "2px",
-                        ringColor: "#7a00e9a",
-                        borderColor: "transparent",
+                  <TextField
+                    label="Word / Expression"
+                    placeholder="Example: serendipity"
+                    fullWidth
+                    size="small"
+                    sx={vocabStyles.textField}
+                    {...register("word", { required: true })}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              sx={vocabStyles.searchButton}
+                              onClick={() =>
+                                searchDefinitionWord(
+                                  watch("word")?.trim() || ""
+                                )
+                              }
+                              size="small"
+                            >
+                              <SearchIcon size={18} />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
                       },
                     }}
-                    type="text"
-                    {...register("word", { required: true })}
-                    placeholder="Example: serendipity"
-                    inputProps={{ "aria-label": "search" }}
                   />
-                  <IconButton
-                    type="button"
-                    sx={{ p: "10px" }}
-                    aria-label="search"
-                    onClick={() =>
-                      searchDefinitionWord(watch("word")?.trim() || "")
-                    }
+                  <TextField
+                    label="Definition"
+                    placeholder="Definition in English"
+                    fullWidth
+                    size="small"
+                    sx={vocabStyles.textField}
+                    {...register("definition")}
+                    slotProps={{
+                      input: {
+                        readOnly: false,
+                      },
+                      inputLabel: {
+                        shrink: !!watch("definition"),
+                      },
+                    }}
+                  />
+                </Stack>
+
+                {/* Type / Synonyms / Antonyms chips */}
+                {(type || synonyms.length > 0 || antonyms.length > 0) && (
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    flexWrap="wrap"
+                    useFlexGap
+                    alignItems="center"
                   >
-                    <SearchIcon />
-                  </IconButton>
-                </Paper>
-              </div>
+                    {type && (
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography sx={vocabStyles.chipLabel}>
+                          Type:
+                        </Typography>
+                        <Chip label={type} size="small" sx={vocabStyles.chipType} />
+                      </Stack>
+                    )}
+                    {synonyms.length > 0 && (
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography sx={vocabStyles.chipLabel}>
+                          Synonyms:
+                        </Typography>
+                        {synonyms.map((s) => (
+                          <Chip
+                            key={s}
+                            label={s}
+                            size="small"
+                            sx={vocabStyles.chipSynonym}
+                          />
+                        ))}
+                      </Stack>
+                    )}
+                    {antonyms.length > 0 && (
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography sx={vocabStyles.chipLabel}>
+                          Antonyms:
+                        </Typography>
+                        {antonyms.map((a) => (
+                          <Chip
+                            key={a}
+                            label={a}
+                            size="small"
+                            sx={vocabStyles.chipAntonym}
+                          />
+                        ))}
+                      </Stack>
+                    )}
+                  </Stack>
+                )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Definition
-                </label>
-                <input
-                  type="text"
-                  {...register("definition", { required: false })}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="Definition in English"
+                {/* Sentence */}
+                <TextField
+                  label="Example sentence / Mental association"
+                  placeholder="Write an example sentence that helps you remember the word"
+                  fullWidth
+                  multiline
+                  rows={3}
+                  size="small"
+                  sx={vocabStyles.textField}
+                  {...register("sentence", { required: true })}
                 />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center justify-center m-2">
-              <div className="col-span-2">
-              <Stack direction="row" spacing={1} alignItems="center">
-                <p className="block text-sm font-medium text-gray-700 mb-2">
-                  Type: 
-                </p>
-                {
-                  type !== "" ?  (
-                    <Chip label={type} color="primary" size="small" />
-                  ) : null
-                }
-              </Stack>
-              </div>
-              <div className="col-span-5">
-              <Stack direction="row" spacing={1} alignItems="center">
-                <p className="block text-sm font-medium text-gray-700 mb-2">
-                  Synonyms: 
-                </p>
-                {synonyms.map((synonym) => <Chip key={synonym} label={synonym} color="success" size="small" />)}
-              </Stack>
-              </div>
-              <div className="col-span-5">
-              <Stack direction="row" spacing={1} alignItems="center">
-                <p className="block text-sm font-medium text-gray-700 mb-2">
-                  Antonyms: 
-                </p>
-                {antonyms.map((antonym) => <Chip key={antonym} label={antonym} color="error" size="small" />)}
-              </Stack>
-              </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Example sentence / Mental association
-              </label>
-              <textarea
-                {...register("sentence", { required: true })}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                rows={3}
-                placeholder="Write a example sentence or mental association that helps you remember the word"
-              />
-            </div>
+                {/* Grammar feedback */}
+                {!grammarFeedback.isCorrect &&
+                  grammarFeedback.explanation &&
+                  grammarFeedback.suggestion && (
+                    <Box sx={vocabStyles.feedbackAlert}>
+                      <Typography sx={vocabStyles.feedbackTitle}>
+                        <AlertTriangle size={18} />
+                        The sentence is not correct
+                      </Typography>
+                      <Typography sx={vocabStyles.feedbackText}>
+                        {grammarFeedback.explanation}
+                      </Typography>
+                      <Typography sx={vocabStyles.feedbackSuggestion}>
+                        Suggestion: {grammarFeedback.suggestion}
+                      </Typography>
+                    </Box>
+                  )}
 
-            <button
-              type="submit"
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              <Plus className="mr-2" size={16} />
-              Add Word
-            </button>
-          </form>
-        </div>
-      </div>
-      {grammarFeedback.isCorrect == false &&
-        grammarFeedback.explanation != "" &&
-        grammarFeedback.suggestion != "" && (
-          <div className="mt-8 bg-yellow-200 p-4 rounded-lg">
-            <div className="flex items-center">
-              <XCircle className="mr-2 text-yellow-600" size={24} />
-              <p className="text-yellow-700 font-bold">
-                La oración no es correcta.
-              </p>
-            </div>
-            <p className="text-yellow-700">{grammarFeedback.explanation}</p>
-            <p className="text-yellow-700 font-bold">
-              Sugerencia: {grammarFeedback.suggestion}
-            </p>
-          </div>
+                {/* Submit */}
+                <Box>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    startIcon={<Plus size={18} />}
+                    sx={vocabStyles.submitButton}
+                    disableElevation
+                  >
+                    Add Word
+                  </Button>
+                </Box>
+              </Stack>
+            </form>
+          </Box>
         )}
-      <div className="mt-8">
+
+        {/* Word list */}
         <TableListVocabulary words={words} />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
