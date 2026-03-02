@@ -1,122 +1,160 @@
-/*button {
-  background: linear-gradient(135deg, #7C5CF4, #5A40D0);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 20px;
-  font-weight: 600;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(92, 63, 244, 0.4);
-}
-*/
+const levelColors: Record<string, { bg: string; text: string; border: string; glow: string }> = {
+  A1: { bg: "#dcfce7", text: "#166534", border: "#86efac", glow: "rgba(34,197,94,0.15)" },
+  A2: { bg: "#d1fae5", text: "#065f46", border: "#6ee7b7", glow: "rgba(16,185,129,0.15)" },
+  B1: { bg: "#fef9c3", text: "#854d0e", border: "#fde047", glow: "rgba(234,179,8,0.15)" },
+  B2: { bg: "#ffedd5", text: "#9a3412", border: "#fdba74", glow: "rgba(249,115,22,0.15)" },
+  C1: { bg: "#ede9fe", text: "#5b21b6", border: "#a78bfa", glow: "rgba(139,92,246,0.15)" },
+  C2: { bg: "#ffe4e6", text: "#9f1239", border: "#fda4af", glow: "rgba(244,63,94,0.15)" },
+};
 
-export const styles = {
+export const getLevelColor = (level: string) =>
+  levelColors[level] || levelColors.B1;
+
+const font = {
+  heading: "'Playfair Display', serif",
+  body: "'DM Sans', sans-serif",
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const styles: Record<string, any> = {
   typography: {
     grammarTopic: {
-      fontWeight: "600",
-      fontFamily: "Poppins",
-      fontSize: "0.9rem",
-      color: "#20243E",
-      backgroundColor: "#FFC857",
+      fontWeight: 600,
+      fontFamily: font.body,
+      fontSize: "0.85rem",
+      color: "#f5f0ff",
       borderRadius: "1.25rem",
-      padding: "1.125rem",
+      padding: "0.6rem 1.2rem",
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "0.4rem",
     },
     titleGrammar: {
-      color: "#ffffff",
-      fontSize: "2rem",
-      fontWeight: "700",
-      fontFamily: "Poppins",
-      padding: "0.8rem",
+      color: "#1a0a33",
+      fontSize: { xs: "1.4rem", sm: "1.6rem", md: "1.8rem" },
+      fontWeight: 700,
+      fontFamily: font.heading,
+      letterSpacing: "-0.01em",
+      lineHeight: 1.3,
     },
     cardTitle: {
-      color: "#ffffff",
-      fontSize: "0.8rem",
-      fontWeight: "700",
-      fontFamily: "Poppins",
-      padding: "0.2rem",
+      color: "#1a1a2e",
+      fontSize: { xs: "0.88rem", md: "0.95rem" },
+      fontWeight: 600,
+      fontFamily: font.body,
+      lineHeight: 1.45,
+      letterSpacing: "0.01em",
     },
   },
   paper: {
     mainContent: {
-      backgroundColor: "#4650ba",
-      borderRadius: "0.875rem",
-      boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.03)",
-      padding: "2.5rem",
-      marginBlock: "1.6rem",
+      background: "#ffffff",
+      borderRadius: "1rem",
+      boxShadow: "0 1px 3px rgba(47,15,87,0.06), 0 4px 16px rgba(47,15,87,0.04)",
+      border: "1px solid rgba(146,82,224,0.08)",
+      overflow: "hidden",
+      transition: "all 0.35s cubic-bezier(0.23, 1, 0.32, 1)",
+      "&:hover": {
+        transform: "translateY(-4px)",
+        boxShadow: "0 12px 32px rgba(47,15,87,0.12), 0 4px 12px rgba(122,0,233,0.08)",
+        border: "1px solid rgba(146,82,224,0.18)",
+      },
     },
   },
   box: {
     mainContent: {
-      p: 2,
       width: "100%",
-      height: "100%",
-      backgroundColor: "#e9e7ff",
+      minHeight: "100vh",
+      background: "#f8f6ff",
+      position: "relative",
+      overflow: "hidden",
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: { xs: "320px", sm: "360px", md: "380px" },
+        background: "linear-gradient(160deg, #1a0a33 0%, #2f0f57 35%, #5a1fad 70%, #7a00e9 100%)",
+        zIndex: 0,
+      },
+      "&::after": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        right: "-20%",
+        width: "500px",
+        height: "500px",
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(146,82,224,0.25) 0%, transparent 70%)",
+        zIndex: 0,
+        pointerEvents: "none",
+      },
     },
     card: {
       width: "100%",
-      height: {xs: "auto", md: "800px"},
-      display: "grid",  
-      gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px, 100%), 1fr))',
-      gap: 2,
+      display: "grid",
+      gridTemplateColumns: {
+        xs: "1fr",
+        sm: "repeat(2, 1fr)",
+        md: "repeat(3, 1fr)",
+        lg: "repeat(4, 1fr)",
+      },
+      gap: { xs: 2, md: 2.5 },
+      position: "relative",
+      zIndex: 1,
     },
   },
   explainingBox: {
     container: {
       backgroundColor: "#ffffff",
       borderRadius: "0.875rem",
-      boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.03)",
-      padding: "1.6rem",
+      boxShadow: "0 2px 12px rgba(47,15,87,0.04)",
+      border: "1px solid #f0ecf8",
+      padding: { xs: "1rem", md: "1.4rem" },
     },
     title: {
-      color: "#4650ba",
-      fontSize: "1.1rem",
-      fontWeight: "600",
+      color: "#5b21b6",
+      fontSize: { xs: "0.9rem", md: "1rem" },
+      fontWeight: 700,
+      fontFamily: font.body,
+      mb: 0.8,
+      display: "flex",
+      alignItems: "center",
+      gap: 1,
     },
     text: {
-      backgroundColor: "#FFFFFF",
-      borderRadius: "0.875rem",
-      fontSize: "0.95rem",
-      color: "#20243E",
-      lineHeight: "1.5",
-      padding: "0.5rem",
+      fontSize: { xs: "0.88rem", md: "0.93rem" },
+      color: "#3d3556",
+      lineHeight: 1.7,
+      fontFamily: font.body,
     },
   },
   formulateBox: {
     container: {
-      backgroundColor: "#7C5CF4",
-      border: "none",
-      borderRadius: "12px",
-      padding: "10px 20px",
-      marginBlock: "1.6rem",
+      background: "linear-gradient(135deg, #7a00e9 0%, #5b21b6 100%)",
+      borderRadius: "0.875rem",
+      padding: { xs: "1rem", md: "1.4rem" },
     },
     title: {
-      fontWeight: "700",
-      transition: "transform 0.2s, box-shadow 0.2s",
-      color: "#FFFFFF",
-      fontSize: "1rem",
+      fontWeight: 700,
+      color: "#ffffff",
+      fontSize: { xs: "0.9rem", md: "1rem" },
+      fontFamily: font.body,
+      mb: 0.8,
+      display: "flex",
+      alignItems: "center",
+      gap: 1,
     },
     text: {
-      transition: "transform 0.2s, box-shadow 0.2s",
-      borderRadius: "0.875rem",
-      fontSize: "0.95rem",
-      color: "#fffffd",
-      lineHeight: "1.5",
-      padding: "0.5rem",
+      fontSize: { xs: "0.88rem", md: "0.93rem" },
+      color: "rgba(255,255,255,0.9)",
+      lineHeight: 1.7,
+      fontFamily: font.body,
+      pl: 2,
+      borderLeft: "2px solid rgba(255,255,255,0.25)",
+      my: 0.5,
     },
-    hover: {
-      transform: "translateY(-2px)",
-      boxShadow: "0 4px 12px rgba(124, 92, 244, 0.4)",
-    },
-    card: {
-      backgroundColor: "#4650ba",
-      borderRadius: "0.875rem",
-      boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.03)",
-      padding: "2.5rem",
-      marginBlock: "1.6rem",
-    },  
   },
   level: {
     container: {
@@ -127,24 +165,33 @@ export const styles = {
     },
   },
   mainTitle: {
-    color: "#2e0f56",
-    fontSize: "2rem",
-    fontWeight: "700",
-    fontFamily: "Poppins",
-    padding: "0.8rem",
-    margin: "0 auto",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    color: "#ffffff",
+    fontSize: { xs: "1.6rem", sm: "2rem", md: "2.4rem" },
+    fontWeight: 700,
+    fontFamily: font.heading,
+    letterSpacing: "-0.02em",
+    textAlign: "center",
+    position: "relative",
+    zIndex: 1,
   },
   addGrammarButton: {
-    textTransform: 'capitalize', 
-    fontWeight: 'bold', 
-    mb: 4, 
-    bgcolor: '#2e0f56', 
-    color: '#fff',
-    margin: "0 auto",
-    display: "flex",
-  }
+    textTransform: "none",
+    fontWeight: 600,
+    fontFamily: font.body,
+    fontSize: { xs: "0.85rem", md: "0.92rem" },
+    bgcolor: "rgba(255,255,255,0.15)",
+    color: "#ffffff",
+    borderRadius: "0.75rem",
+    border: "1px solid rgba(255,255,255,0.25)",
+    backdropFilter: "blur(10px)",
+    px: { xs: 2.5, md: 3 },
+    py: 1.1,
+    transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
+    "&:hover": {
+      bgcolor: "rgba(255,255,255,0.25)",
+      border: "1px solid rgba(255,255,255,0.4)",
+      transform: "translateY(-2px)",
+      boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+    },
+  },
 };

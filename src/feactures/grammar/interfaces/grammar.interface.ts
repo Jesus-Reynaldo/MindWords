@@ -7,6 +7,13 @@ export interface GrammarTopic {
     formulates: string[];
     examples: string[];
 }
+export interface QuizQuestion {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+    explanation: string;
+}
+
 export interface ReviewTopic {
     id?: string;
     topicId?: string;

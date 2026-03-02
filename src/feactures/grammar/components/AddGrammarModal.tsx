@@ -17,7 +17,9 @@ import { useForm } from "react-hook-form";
 import { generateGrammarTopicWithGemini } from "../services/api_grammar_gemini";
 import type { GrammarTopic } from "../interfaces/grammar.interface";
 import { insertGrammarTopic } from "../services/supabaseGrammar";
-interface AddGrammarModalProps {  
+import { Sparkles } from "lucide-react";
+
+interface AddGrammarModalProps {
   open: boolean;
   onClose: () => void;
 }
@@ -29,22 +31,22 @@ interface Inputs {
 
 export const AddGrammarModal = ({ open, onClose }: AddGrammarModalProps) => {
   const { register, handleSubmit, reset } = useForm<Inputs>();
+
   const onSubmit = async (data: Inputs) => {
     const { topic, levelEnglish } = data;
-    console.log(topic, levelEnglish)
     try {
       const topicGenerated: GrammarTopic = await generateGrammarTopicWithGemini(topic, levelEnglish);
-      if(topicGenerated){
-        const topic: GrammarTopic = {
+      if (topicGenerated) {
+        const newTopic: GrammarTopic = {
           title: topicGenerated.title,
           levelEnglish: topicGenerated.levelEnglish,
           explanation: topicGenerated.explanation,
           formulates: topicGenerated.formulates,
           examples: topicGenerated.examples,
           createdAt: new Date().toISOString(),
-        }
-        const topicInsert = await insertGrammarTopic(topic);
-        if(topicInsert){
+        };
+        const topicInsert = await insertGrammarTopic(newTopic);
+        if (topicInsert) {
           onClose();
           reset();
         }
@@ -53,28 +55,43 @@ export const AddGrammarModal = ({ open, onClose }: AddGrammarModalProps) => {
       console.error(error);
     }
   };
+
   return (
     <Dialog open={open} onClose={onClose} sx={modalStyles.dialog}>
       <DialogTitle sx={modalStyles.dialogTitle}>
-        <Typography variant="h5" component="h5" sx={{ fontWeight: 600 }}>
-          Add Grammar
+        <Typography
+          variant="h5"
+          component="h5"
+          sx={{
+            fontWeight: 700,
+            fontFamily: "'Playfair Display', serif",
+            fontSize: { xs: "1.15rem", md: "1.3rem" },
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <Sparkles size={18} />
+          New Grammar Topic
         </Typography>
       </DialogTitle>
       <DialogContent sx={modalStyles.dialogContent}>
         <DialogContentText sx={modalStyles.dialogContentText}>
-          To add a new grammar topic, please fill in the details below.
+          Enter a grammar topic and level. Our AI will generate a complete lesson with explanations, structures, and examples.
         </DialogContentText>
         <form id="add-grammar-form" onSubmit={handleSubmit(onSubmit)}>
           <TextField
             autoFocus
+            label="Grammar topic"
+            placeholder="e.g. Present Perfect Continuous"
             margin="normal"
             type="text"
             fullWidth
             variant="outlined"
             {...register("topic", { required: true })}
-            sx={{ mb: 2 }}
+            sx={{ ...modalStyles.textField, mb: 2 }}
           />
-          <FormControl fullWidth margin="normal" sx={{ mb: 3 }}>
+          <FormControl fullWidth margin="normal" sx={{ ...modalStyles.select, mb: 1 }}>
             <InputLabel id="level-english-label">English Level</InputLabel>
             <Select
               label="English Level"
@@ -83,7 +100,7 @@ export const AddGrammarModal = ({ open, onClose }: AddGrammarModalProps) => {
               <MenuItem value="A1">A1 - Beginner</MenuItem>
               <MenuItem value="A2">A2 - Elementary</MenuItem>
               <MenuItem value="B1">B1 - Intermediate</MenuItem>
-              <MenuItem value="B2">B2 - Upper-Intermediate</MenuItem>
+              <MenuItem value="B2">B2 - Upper Intermediate</MenuItem>
               <MenuItem value="C1">C1 - Advanced</MenuItem>
               <MenuItem value="C2">C2 - Proficiency</MenuItem>
             </Select>
@@ -91,16 +108,16 @@ export const AddGrammarModal = ({ open, onClose }: AddGrammarModalProps) => {
         </form>
       </DialogContent>
       <DialogActions sx={modalStyles.dialogActions}>
-        <Button onClick={onClose} sx={{ color: "#757575" }}>
+        <Button onClick={onClose} sx={modalStyles.cancelButton}>
           Cancel
         </Button>
         <Button
           type="submit"
           form="add-grammar-form"
           variant="contained"
-          sx={{ backgroundColor: "#2e0f56" }}
+          sx={modalStyles.submitButton}
         >
-          Add Grammar
+          Generate Lesson
         </Button>
       </DialogActions>
     </Dialog>

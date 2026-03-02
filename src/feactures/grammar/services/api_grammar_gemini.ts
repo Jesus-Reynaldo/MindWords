@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import type { GrammarTopic } from "../interfaces/grammar.interface";
+import type { GrammarTopic, QuizQuestion } from "../interfaces/grammar.interface";
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
@@ -51,4 +51,60 @@ Constraints:
   });
   console.log("response", response.text);
   return JSON.parse(response.text || "{}");
+}
+
+export async function generateQuizQuestionsWithGemini(
+  topic: GrammarTopic
+): Promise<QuizQuestion[]> {
+  const system = `
+You are a TOEFL exam question writer specializing in English grammar.
+You create multiple-choice questions that test understanding of specific grammar rules.
+Always output exactly 5 questions. Each question must have exactly 4 options.
+The correctAnswer field must be the 0-based index of the correct option.
+`.trim();
+
+  const user = `
+Create 5 TOEFL-style multiple-choice questions for the grammar topic: "${topic.title}" (${topic.levelEnglish} level).
+
+Topic explanation: ${topic.explanation}
+
+Rules/Formulas:
+${topic.formulates.map((f, i) => `${i + 1}. ${f}`).join("\n")}
+
+Examples:
+${topic.examples.map((e, i) => `${i + 1}. ${e}`).join("\n")}
+
+Requirements:
+- Each question should test a different aspect of this grammar topic.
+- Use fill-in-the-blank or sentence completion format.
+- Make distractors (wrong options) plausible but clearly incorrect.
+- Provide a brief explanation for why the correct answer is right.
+- Match the ${topic.levelEnglish} difficulty level.
+`.trim();
+
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash-lite",
+    contents: system + "\n\n" + user,
+    config: {
+      thinkingConfig: {
+        thinkingBudget: 0,
+      },
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            question: { type: "string" },
+            options: { type: "array", items: { type: "string" } },
+            correctAnswer: { type: "integer" },
+            explanation: { type: "string" },
+          },
+          required: ["question", "options", "correctAnswer", "explanation"],
+        },
+      },
+    },
+  });
+
+  return JSON.parse(response.text || "[]");
 }
