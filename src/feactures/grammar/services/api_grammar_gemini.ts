@@ -64,7 +64,7 @@ The correctAnswer field must be the 0-based index of the correct option.
 `.trim();
 
   const user = `
-Create 5 TOEFL-style multiple-choice questions for the grammar topic: "${topic.title}" (${topic.levelEnglish} level).
+Create 20 TOEFL-style multiple-choice questions for the grammar topic: "${topic.title}" (${topic.levelEnglish} level).
 
 Topic explanation: ${topic.explanation}
 
