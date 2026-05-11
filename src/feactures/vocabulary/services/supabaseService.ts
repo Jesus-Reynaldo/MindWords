@@ -1,88 +1,59 @@
-import { supabase } from "../../core/lib/supabaseClient";
-import type { Word } from "../interfaces/vocabulary.interface";
-import dayjs from "dayjs";
+import type { Word } from '../interfaces/vocabulary.interface'
 
-
-
-export const insertWord = async (newWord: Omit<Word, "id">): Promise<Word[]> => {
-    const {data: { user }, error: userError} = await supabase.auth.getUser();
-      if (userError || !user) {
-        console.error("User not authenticated:", userError?.message);
-        return [];
-      }
-
-      console.log("user.id", user.id);
-  
-  const { data, error } = await supabase
-    .from("Word")
-    .insert([{...newWord, user_id: user.id}])
-    .select();
-
-  if (error) {
-    console.error("Error inserting word:", error.message);
-    return [];
+function authHeaders(): Record<string, string> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   }
+}
 
-  return data as Word[];
-};
+export const insertWord = async (newWord: Omit<Word, 'id'>): Promise<Word[]> => {
+  try {
+    const res = await fetch('/api/words', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(newWord),
+    })
+    if (!res.ok) return []
+    const word = await res.json()
+    return [word as Word]
+  } catch {
+    return []
+  }
+}
 
 export const getWords = async (): Promise<Word[]> => {
-  const {data: { user }, error: userError} = await supabase.auth.getUser();
-    if (userError || !user) {
-      console.error("User not authenticated:", userError?.message);
-      return [];
-    }
-  const { data, error } = await supabase.from("Word").select().eq("user_id", user.id);
-
-  if (error) {
-    console.error("Error fetching words:", error.message);
-    return [];
+  try {
+    const res = await fetch('/api/words', { headers: authHeaders() })
+    if (!res.ok) return []
+    return res.json()
+  } catch {
+    return []
   }
-
-  return data as Word[];
-};
+}
 
 export const updateWordSupabase = async (word: Word): Promise<Word[]> => {
-  const {data: { user }, error: userError} = await supabase.auth.getUser();
-    if (userError || !user) {
-      console.error("User not authenticated:", userError?.message);
-      return [];
-    }
-  const { data, error } = await supabase
-    .from("Word")
-    .update({ ...word, user_id: user.id })
-    .eq("id", word.id)
-    .select();
-
-  if (error) {
-    console.error("Error updating word:", error.message);
-    return [];
+  try {
+    const res = await fetch(`/api/words/${word.id}`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify(word),
+    })
+    if (!res.ok) return []
+    const updated = await res.json()
+    return [updated as Word]
+  } catch {
+    return []
   }
-
-  return data as Word[];
-};
+}
 
 export const getWordByReviewDate = async (limit: number = 20): Promise<Word[]> => {
-  const {data: { user }, error: userError} = await supabase.auth.getUser();
-  if (userError || !user) {
-    console.error("User not authenticated:", userError?.message);
-    return [];
+  try {
+    const res = await fetch(`/api/words/review?limit=${limit}`, { headers: authHeaders() })
+    if (!res.ok) return []
+    return res.json()
+  } catch {
+    return []
   }
-  
-  const today = dayjs().format("YYYY-MM-DD");
-  
-  const { data, error } = await supabase
-    .from("Word")
-    .select()
-    .lte("nextReviewDate", today)
-    .eq("user_id", user.id)
-    .order("nextReviewDate", { ascending: true })
-    .limit(limit);
-  
-  if (error) {
-    console.error("Error fetching words:", error.message);
-    return [];
-  }
-  
-  return data as Word[];
-};
+}

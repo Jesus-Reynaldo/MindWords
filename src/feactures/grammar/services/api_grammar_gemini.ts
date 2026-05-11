@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import type { GrammarTopic, QuizQuestion } from "../interfaces/grammar.interface";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
 
 export async function generateGrammarTopicWithGemini(
   topic: string,

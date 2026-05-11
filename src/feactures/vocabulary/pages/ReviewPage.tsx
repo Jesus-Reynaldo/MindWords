@@ -1,3 +1,4 @@
+'use client'
 import { Review } from "../components/Review";
 import { useState, useEffect } from "react";
 import type { Word } from "../interfaces/vocabulary.interface";

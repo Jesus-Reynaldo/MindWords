@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from "react";
 import type {
   Word,
@@ -23,7 +24,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { updateWordSupabase } from "../services/supabaseService";
-import { useNavigate } from "react-router";
+import { useRouter } from "next/navigation";
 import { vocabStyles } from "../styles/style";
 
 type Inputs = {
@@ -38,7 +39,7 @@ interface ReviewProps {
 const intervals: number[] = [1, 2, 4, 7, 14, 30];
 
 export const Review = ({ words }: ReviewProps) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [grammarFeedback, setGrammarFeedback] = useState<GrammarFeedback>({
     isCorrect: false,
     explanation: "",
@@ -93,9 +94,9 @@ export const Review = ({ words }: ReviewProps) => {
     if (wordsList.length > 0) {
       setCurrentWord(wordsList[0]);
     } else {
-      navigate("/vocabulary");
+      router.push("/vocabulary");
     }
-  }, [wordsList, navigate]);
+  }, [wordsList, router]);
 
   const updateWord = async (word: Word) => {
     const response = await updateWordSupabase(word);
@@ -134,11 +135,11 @@ export const Review = ({ words }: ReviewProps) => {
               All caught up!
             </Typography>
             <Typography sx={vocabStyles.completionText}>
-              You've reviewed all {totalWords} words for today.
+              You&apos;ve reviewed all {totalWords} words for today.
             </Typography>
             <Button
               sx={{ ...vocabStyles.submitButton, mt: 3 }}
-              onClick={() => navigate("/vocabulary")}
+              onClick={() => router.push("/vocabulary")}
               startIcon={<BookOpen size={18} />}
               disableElevation
             >

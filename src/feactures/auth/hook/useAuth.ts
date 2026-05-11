@@ -1,20 +1,34 @@
+'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '../../core/lib/supabaseClient'
-import type { Session, User } from '@supabase/supabase-js'
 
+export interface AuthUser {
+  id: string
+  email: string
+}
+
+function parseToken(token: string): AuthUser | null {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return { id: payload.userId, email: payload.email ?? '' }
+  } catch {
+    return null
+  }
+}
 
 export function useAuth() {
-  const [session, setSession] = useState<Session | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session || null)
-      setLoading(false)
-    })
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
-    return () => sub.subscription.unsubscribe()
+    const token = localStorage.getItem('token')
+    setUser(token ? parseToken(token) : null)
+    setLoading(false)
   }, [])
 
-  return { session, loading, user: session?.user as User | undefined }
+  const logout = () => {
+    localStorage.removeItem('token')
+    window.location.href = '/login'
+  }
+
+  return { user, loading, logout }
 }
