@@ -1,3 +1,4 @@
+'use client'
 import {
   Box,
   Button,
@@ -12,14 +13,14 @@ import { useEffect, useState } from "react";
 import type { GrammarTopic } from "../interfaces/grammar.interface";
 import { getGrammarTopics } from "../services/supabaseGrammar";
 import { Loading } from "../../../shares/components/Loading";
-import { useNavigate } from "react-router";
+import { useRouter } from "next/navigation";
 import { BookOpen, Plus, Sparkles, ArrowRight, GraduationCap } from "lucide-react";
 import { AddGrammarModal } from "../components/AddGrammarModal";
 
 const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 export const GrammarTopicsPage = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [grammarTopics, setGrammarTopics] = useState<GrammarTopic[]>([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
@@ -218,7 +219,7 @@ export const GrammarTopicsPage = () => {
                   }}
                 >
                   <CardActionArea
-                    onClick={() => navigate(`/grammar/${topic.id}`)}
+                    onClick={() => router.push(`/grammar/${topic.id}`)}
                     sx={{
                       height: "100%",
                       display: "flex",

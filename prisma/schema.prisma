@@ -1,0 +1,57 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  password      String
+  createdAt     DateTime       @default(now())
+  words         Word[]
+  grammarTopics GrammarTopic[]
+  reviewTopics  ReviewTopic[]
+}
+
+model Word {
+  id             String   @id @default(cuid())
+  word           String
+  definition     String
+  sentence       String[]
+  level          Int
+  nextReviewDate String
+  dateAdded      String
+  lastReviewed   String?
+  dias           Int[]
+  type           String?
+  synonyms       String[]
+  antonyms       String[]
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GrammarTopic {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  levelEnglish String
+  title        String
+  explanation  String
+  formulates   String[]
+  examples     String[]
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ReviewTopic {
+  id             String   @id @default(cuid())
+  topicId        String
+  createdAt      DateTime @default(now())
+  nextReviewDate String?
+  dias           Int[]
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

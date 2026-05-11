@@ -1,7 +1,8 @@
+'use client'
 import { useEffect, useState } from "react";
 import type { GrammarTopic } from "../interfaces/grammar.interface";
 import { getGrammarTopicById } from "../services/supabaseGrammar";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useRouter } from "next/navigation";
 import { Loading } from "../../../shares/components/Loading";
 import { GrammarTopicContent } from "../components/GrammarTopicContent";
 import { GrammarTopicPracticing } from "../components/GrammarTopicPracticing";
@@ -10,8 +11,9 @@ import { ArrowLeft } from "lucide-react";
 import { getLevelColor } from "../styles/style";
 
 export const GrammarPage = () => {
-  const { grammarId } = useParams();
-  const navigate = useNavigate();
+  const params = useParams();
+  const grammarId = params?.grammarId as string | undefined;
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [grammarTopic, setGrammarTopic] = useState<GrammarTopic | null>(null);
   const [activeTab, setActiveTab] = useState<"content" | "practice">("content");
@@ -21,7 +23,7 @@ export const GrammarPage = () => {
       if (grammarId) {
         const topic = await getGrammarTopicById(grammarId);
         if (!topic) {
-          navigate("/grammar");
+          router.push("/grammar");
           return;
         }
         setGrammarTopic(topic);
@@ -29,7 +31,7 @@ export const GrammarPage = () => {
       }
     };
     fetchGrammarTopic();
-  }, [grammarId, navigate]);
+  }, [grammarId, router]);
 
   if (loading || !grammarTopic) {
     return <Loading />;
@@ -68,7 +70,7 @@ export const GrammarPage = () => {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
           <IconButton
-            onClick={() => navigate("/grammar")}
+            onClick={() => router.push("/grammar")}
             sx={{
               color: "rgba(255,255,255,0.7)",
               "&:hover": { color: "#fff", bgcolor: "rgba(255,255,255,0.1)" },
