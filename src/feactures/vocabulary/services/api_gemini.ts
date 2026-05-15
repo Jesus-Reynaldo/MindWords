@@ -7,7 +7,7 @@ const ai = new GoogleGenAI({apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY});
 
 export async function validateGrammarWithGemini(sentence: string, word: string): Promise<GrammarFeedback> {
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-lite",
+    model: "gemini-3.1-flash-lite",
     contents: `Verifica la gramática de la oración en inglés. Debe usar la palabra "${word}". 
 Oración: "${sentence}"`,
     config: {
@@ -32,7 +32,7 @@ Oración: "${sentence}"`,
 
 export async function defineWordWithGemini(word: string): Promise<DefineWord> {
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-lite",
+    model: "gemini-3.1-flash-lite",
     contents: `Define la palabra "${word}" en inglés. La respuesta debe ser corta y precisa maximo 6 palabras. Al final debe decir entre parentesis que tipo de palabra es por ejemplo (n, v, adj, adv, prep, phv, ind)`,
     config: {
       thinkingConfig: {

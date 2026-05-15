@@ -29,7 +29,7 @@ Constraints:
 - No extra sections beyond the 4 specified.
 `.trim();
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-lite",
+    model: "gemini-3.1-flash-lite",
     contents: system + "\n\n" + user,
     config: {
       thinkingConfig: {
@@ -83,7 +83,7 @@ Requirements:
 `.trim();
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-lite",
+    model: "gemini-3.1-flash-lite",
     contents: system + "\n\n" + user,
     config: {
       thinkingConfig: {
